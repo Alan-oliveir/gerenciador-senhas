@@ -125,3 +125,6 @@ dmypy.json
 
 # Keys
 keys/
+
+# Database
+db/

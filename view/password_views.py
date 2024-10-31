@@ -42,6 +42,7 @@ class FernetHasher:
         file = 'key.key'
         while Path(cls.KEY_DIR / file).exists():
             file = f'key_{cls._get_random_string(5)}.key'
+
         with open(cls.KEY_DIR / file, 'wb') as arq:
             arq.write(key)
         return cls.KEY_DIR / file
@@ -56,6 +57,7 @@ class FernetHasher:
     def decrypt(self, value):
         if not isinstance(value, bytes):
             value = value.encode('utf-8')
+            
         try:
             return self.fernet.decrypt(value).decode()
         except InvalidToken as e:
