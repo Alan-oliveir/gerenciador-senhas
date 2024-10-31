@@ -57,7 +57,7 @@ class FernetHasher:
     def decrypt(self, value):
         if not isinstance(value, bytes):
             value = value.encode('utf-8')
-            
+
         try:
             return self.fernet.decrypt(value).decode()
         except InvalidToken as e:
