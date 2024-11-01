@@ -46,7 +46,7 @@ Um aplicativo em Python para gerenciar e armazenar senhas criptografadas localme
 
 - model/password.py: Define a estrutura do banco de dados local para armazenar senhas.
 - view/password_views.py: Lida com a criptografia de senhas usando o FernetHasher.
-- template.py: Arquivo principal que gerencia a interação com o usuário e manipula o fluxo de salvar e recuperar senhas.
+- templates/template.py: Arquivo principal que gerencia a interação com o usuário e manipula o fluxo de salvar e recuperar senhas.
 
 ## Licença
 Este projeto é licenciado sob a licença MIT.
