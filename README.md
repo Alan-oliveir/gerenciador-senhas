@@ -50,4 +50,3 @@ Um aplicativo em Python para gerenciar e armazenar senhas criptografadas localme
 
 ## Licença
 Este projeto é licenciado sob a licença MIT.
-
