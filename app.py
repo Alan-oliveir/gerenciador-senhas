@@ -12,7 +12,6 @@ class ErrorWindow(ctk.CTkToplevel):
 
     def __init__(self, master, message):
         super().__init__(master)
-        # self.geometry("400x200")
         self.title("Erro")
 
         # Exibe a mensagem de erro
@@ -21,7 +20,7 @@ class ErrorWindow(ctk.CTkToplevel):
 
         # Botão para fechar a janela de erro
         self.close_button = ctk.CTkButton(self, text="Fechar", command=self.destroy)
-        self.close_button.pack(pady=10)
+        self.close_button.pack(pady=(10, 30))
 
         # Fecha a janela automaticamente após 5 segundos (5000 ms)
         self.after(5000, self.destroy)
@@ -109,7 +108,7 @@ class PasswordManagerApp(ctk.CTk):
 
         try:
             fernet = FernetHasher(self.key)
-            data = Password.get()
+            data = Password.get_all()
             password = None
 
             for item in data:
