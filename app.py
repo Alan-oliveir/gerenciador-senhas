@@ -7,21 +7,56 @@ ctk.set_appearance_mode("system")
 ctk.set_default_color_theme("dark-blue")
 
 
+class ErrorWindow(ctk.CTkToplevel):
+    """Janela para exibir mensagens de erro."""
+
+    def __init__(self, master, message):
+        super().__init__(master)
+        # self.geometry("400x200")
+        self.title("Erro")
+
+        # Exibe a mensagem de erro
+        self.label = ctk.CTkLabel(self, text=message, wraplength=350)
+        self.label.pack(padx=20, pady=20)
+
+        # Botão para fechar a janela de erro
+        self.close_button = ctk.CTkButton(self, text="Fechar", command=self.destroy)
+        self.close_button.pack(pady=10)
+
+        # Fecha a janela automaticamente após 5 segundos (5000 ms)
+        self.after(5000, self.destroy)
+
+
+def prompt_key():
+    """
+    Abre um diálogo para solicitar a chave de criptografia ao usuário.
+
+    Retorna:
+        str: A chave de criptografia fornecida pelo usuário ou None se cancelar.
+    """
+    dialog = ctk.CTkInputDialog(text="Digite sua chave de criptografia:", title="Autenticação")
+    key = dialog.get_input()
+
+    # Se o usuário pressionar "Cancelar", retorna None
+    if key == "" or key is None:
+        return None
+    return key
+
+
 class PasswordManagerApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
         self.title("Gerenciador de Senhas")
-        self.geometry("400x450")
+        self.geometry("400x370")
 
-        # Variável para armazenar a chave temporária
-        self.key = None
+        # Solicita a chave ao usuário ao iniciar
+        self.key = prompt_key()
 
-        # Entrada de chave
-        self.label_key = ctk.CTkLabel(self, text="Chave de Criptografia:")
-        self.label_key.pack(pady=10)
-        self.entry_key = ctk.CTkEntry(self, width=250, show="*")
-        self.entry_key.pack(pady=10)
+        # Caso o usuário tenha cancelado o input, fecha a aplicação
+        if not self.key:
+            self.destroy()
+            return
 
         # Entrada de domínio
         self.label_domain = ctk.CTkLabel(self, text="Domínio:")
@@ -45,28 +80,35 @@ class PasswordManagerApp(ctk.CTk):
         self.result_label = ctk.CTkLabel(self, text="", wraplength=300)
         self.result_label.pack(pady=20)
 
+    def show_error(self, message):
+        """
+        Exibe uma janela de erro com a mensagem fornecida.
+
+        Parâmetros:
+            message (str): A mensagem de erro a ser exibida.
+        """
+        ErrorWindow(self, message)
+
     def save_password(self):
         """Função para salvar a senha criptografada para um domínio especificado."""
-        key = self.entry_key.get()
         domain = self.entry_domain.get()
         password = self.entry_password.get()
 
         try:
-            fernet = FernetHasher(key)
+            fernet = FernetHasher(self.key)
             encrypted_password = fernet.encrypt(password).decode('utf-8')
             p1 = Password(domain=domain, password=encrypted_password)
             p1.save()
             self.result_label.configure(text="Senha salva com sucesso!")
         except ValueError as e:
-            self.result_label.configure(text=f"Erro ao salvar senha: {e}")
+            self.show_error(f"Erro ao salvar senha: {e}")
 
     def retrieve_password(self):
         """Função para recuperar e descriptografar a senha para um domínio especificado."""
-        key = self.entry_key.get()
         domain = self.entry_domain.get()
 
         try:
-            fernet = FernetHasher(key)
+            fernet = FernetHasher(self.key)
             data = Password.get()
             password = None
 
@@ -78,9 +120,9 @@ class PasswordManagerApp(ctk.CTk):
             if password:
                 self.result_label.configure(text=f"Senha recuperada: {password}")
             else:
-                self.result_label.configure(text="Nenhuma senha encontrada para este domínio.")
+                self.show_error("Nenhuma senha encontrada para este domínio.")
         except ValueError as e:
-            self.result_label.configure(text=f"Erro ao recuperar senha: {e}")
+            self.show_error(f"Erro ao recuperar senha: {e}")
 
 
 # Execução da aplicação
