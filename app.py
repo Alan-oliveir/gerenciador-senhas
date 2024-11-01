@@ -3,8 +3,8 @@ from model.password import Password
 from view.password_views import FernetHasher
 
 # Configuração inicial do customtkinter
-ctk.set_appearance_mode("dark")
-ctk.set_default_color_theme("blue")
+ctk.set_appearance_mode("system")
+ctk.set_default_color_theme("dark-blue")
 
 
 class PasswordManagerApp(ctk.CTk):
@@ -12,7 +12,7 @@ class PasswordManagerApp(ctk.CTk):
         super().__init__()
 
         self.title("Gerenciador de Senhas")
-        self.geometry("400x300")
+        self.geometry("400x450")
 
         # Variável para armazenar a chave temporária
         self.key = None
