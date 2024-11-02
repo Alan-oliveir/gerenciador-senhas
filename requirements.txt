@@ -1,5 +1,8 @@
 cffi==1.17.1
 cryptography==43.0.3
+customtkinter==5.2.2
+darkdetect==0.8.0
+packaging==24.1
+password-strength==0.0.3.post2
 pycparser==2.22
-
-customtkinter~=5.2.2
+six==1.16.0
