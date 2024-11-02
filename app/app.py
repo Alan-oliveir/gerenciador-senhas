@@ -1,27 +1,11 @@
 import customtkinter as ctk
 from .models import Password
-from .encryption import FernetHasher
+from .encryption import validate_password, generate_key_from_password, load_existing_key, FernetHasher
 from .dialogs import ErrorWindow
 
 # Configuração inicial do customtkinter
 ctk.set_appearance_mode("system")
 ctk.set_default_color_theme("dark-blue")
-
-
-def prompt_key():
-    """
-    Abre um diálogo para solicitar a chave de criptografia ao usuário.
-
-    Retorna:
-        str: A chave de criptografia fornecida pelo usuário ou None se cancelar.
-    """
-    dialog = ctk.CTkInputDialog(text="Digite sua chave de criptografia:", title="Autenticação")
-    key = dialog.get_input()
-
-    # Se o usuário pressionar "Cancelar", retorna None
-    if key == "" or key is None:
-        return None
-    return key
 
 
 class PasswordManagerApp(ctk.CTk):
@@ -32,7 +16,7 @@ class PasswordManagerApp(ctk.CTk):
         self.geometry("400x370")
 
         # Solicita a chave ao usuário ao iniciar
-        self.key = prompt_key()
+        self.key = self.verify_or_create_key()
 
         # Caso o usuário tenha cancelado o input, fecha a aplicação
         if not self.key:
@@ -104,3 +88,56 @@ class PasswordManagerApp(ctk.CTk):
                 self.show_error("Nenhuma senha encontrada para este domínio.")
         except ValueError as e:
             self.show_error(f"Erro ao recuperar senha: {e}")
+
+    def verify_or_create_key(self):
+        """
+        Verifica se a chave existe, caso contrário pede ao usuário para criar uma senha.
+
+        Retorna:
+            bytes: A chave de criptografia gerada ou carregada.
+        """
+        existing_key = load_existing_key()
+
+        if existing_key:
+            attempts = 0  # Contador de tentativas
+            while attempts < 3:
+                dialog = ctk.CTkInputDialog(text="Digite sua senha para acessar:", title="Autenticação")
+                password = dialog.get_input()
+
+                # Se o usuário cancelar ou não digitar nada, encerre o loop e exiba a mensagem
+                if not password:
+                    self.show_error("Aplicação encerrada: senha não fornecida.")
+                    self.after(3000, self.destroy)  # Aguarda 3 segundos antes de encerrar
+                    return None
+
+                # Converte a senha para uma chave e verifica se bate com a existente
+                generated_key = generate_key_from_password(password)
+                if generated_key == existing_key:
+                    return generated_key
+                else:
+                    attempts += 1
+                    self.show_error(f"Senha incorreta. Tentativas restantes: {3 - attempts}")
+
+            # Exibe mensagem final e fecha após 3 segundos
+            self.show_error("Número máximo de tentativas alcançado. A aplicação será encerrada.")
+            self.after(3000, self.destroy)  # Aguarda 3 segundos antes de encerrar
+            return None
+
+        else:
+            # Solicita ao usuário uma nova senha que atende aos requisitos
+            while True:
+                dialog = ctk.CTkInputDialog(text="Crie uma senha segura:", title="Criar Senha")
+                new_password = dialog.get_input()
+
+                # Se o usuário cancelar ou não digitar nada, exibe mensagem e encerra após 3 segundos
+                if not new_password:
+                    self.show_error("Aplicação encerrada: senha não fornecida.")
+                    self.after(3000, self.destroy)
+                    return None
+
+                if validate_password(new_password):
+                    return generate_key_from_password(new_password)
+                else:
+                    self.show_error(
+                        "A senha deve ter pelo menos 8 caracteres, 1 letra maiúscula, 1 minúscula, 1 número e 1 caractere especial."
+                    )

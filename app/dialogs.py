@@ -1,5 +1,6 @@
 import customtkinter as ctk
 
+
 class ErrorWindow(ctk.CTkToplevel):
     """Janela para exibir mensagens de erro."""
 
@@ -15,5 +16,5 @@ class ErrorWindow(ctk.CTkToplevel):
         self.close_button = ctk.CTkButton(self, text="Fechar", command=self.destroy)
         self.close_button.pack(pady=(10, 30))
 
-        # Fecha a janela automaticamente após 5 segundos (5000 ms)
-        self.after(5000, self.destroy)
+        # Fecha a janela automaticamente após 3 segundos (3000 ms)
+        self.after(3000, self.destroy)
