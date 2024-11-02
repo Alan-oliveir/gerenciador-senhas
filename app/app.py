@@ -104,10 +104,9 @@ class PasswordManagerApp(ctk.CTk):
                 dialog = ctk.CTkInputDialog(text="Digite sua senha para acessar:", title="Autenticação")
                 password = dialog.get_input()
 
-                # Se o usuário cancelar ou não digitar nada, encerre o loop e exiba a mensagem
+                # Se o usuário cancelar ou não digitar nada, encerra a aplicaçao
                 if not password:
-                    self.show_error("Aplicação encerrada: senha não fornecida.")
-                    self.after(3000, self.destroy)  # Aguarda 3 segundos antes de encerrar
+                    self.destroy()
                     return None
 
                 # Converte a senha para uma chave e verifica se bate com a existente
@@ -118,9 +117,7 @@ class PasswordManagerApp(ctk.CTk):
                     attempts += 1
                     self.show_error(f"Senha incorreta. Tentativas restantes: {3 - attempts}")
 
-            # Exibe mensagem final e fecha após 3 segundos
-            self.show_error("Número máximo de tentativas alcançado. A aplicação será encerrada.")
-            self.after(3000, self.destroy)  # Aguarda 3 segundos antes de encerrar
+            self.destroy()
             return None
 
         else:
@@ -129,10 +126,9 @@ class PasswordManagerApp(ctk.CTk):
                 dialog = ctk.CTkInputDialog(text="Crie uma senha segura:", title="Criar Senha")
                 new_password = dialog.get_input()
 
-                # Se o usuário cancelar ou não digitar nada, exibe mensagem e encerra após 3 segundos
+                # Se o usuário cancelar ou não digitar nada, encerra a aplicaçao
                 if not new_password:
-                    self.show_error("Aplicação encerrada: senha não fornecida.")
-                    self.after(3000, self.destroy)
+                    self.destroy()
                     return None
 
                 if validate_password(new_password):

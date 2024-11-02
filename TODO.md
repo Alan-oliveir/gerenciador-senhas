@@ -7,4 +7,4 @@
   - Adicionar funçao para deletar senha.  
 
 
-- Se a senha estiver errada esta fechando a aplicaçao sem exibir qualquer mensagem.
+~~- Se a senha estiver errada esta fechando a aplicaçao sem exibir qualquer mensagem.~~

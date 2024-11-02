@@ -12,9 +12,5 @@ class ErrorWindow(ctk.CTkToplevel):
         self.label = ctk.CTkLabel(self, text=message, wraplength=350)
         self.label.pack(padx=20, pady=20)
 
-        # Botão para fechar a janela de erro
-        self.close_button = ctk.CTkButton(self, text="Fechar", command=self.destroy)
-        self.close_button.pack(pady=(10, 30))
-
         # Fecha a janela automaticamente após 3 segundos (3000 ms)
         self.after(3000, self.destroy)
