@@ -14,7 +14,7 @@ class PasswordManagerApp(ctk.CTk):
         super().__init__()
 
         self.title("Gerenciador de Senhas")
-        self.geometry("400x370")
+        self.geometry("400x420")
 
         # Solicita a chave ao usuário ao iniciar
         self.key = self.verify_or_create_key()
@@ -30,48 +30,83 @@ class PasswordManagerApp(ctk.CTk):
         self.entry_domain = ctk.CTkEntry(self, width=250)
         self.entry_domain.pack(pady=10)
 
-        # Entrada de senha (somente para salvar)
+        # Entrada de senha
         self.label_password = ctk.CTkLabel(self, text="Senha:")
         self.label_password.pack(pady=10)
         self.entry_password = ctk.CTkEntry(self, width=250, show="*")
         self.entry_password.pack(pady=10)
 
-        # Botões de salvar e recuperar
-        self.save_button = ctk.CTkButton(self, text="Salvar Senha", command=self.save_password)
+        # Botão para salvar ou atualizar a senha
+        self.save_button = ctk.CTkButton(self, text="Salvar/Atualizar Senha", command=self.save_or_update_password)
         self.save_button.pack(pady=10)
+
+        # Botão para deletar a senha de um domínio
+        self.delete_button = ctk.CTkButton(self, text="Deletar Senha", command=self.delete_password)
+        self.delete_button.pack(pady=10)
+
+        # Botão para recuperar a senha
         self.retrieve_button = ctk.CTkButton(self, text="Recuperar Senha", command=self.retrieve_password)
         self.retrieve_button.pack(pady=10)
 
-        # Área de exibição de senha recuperada
+        # Área de exibição de senha recuperada ou mensagens
         self.result_label = ctk.CTkLabel(self, text="", wraplength=300)
         self.result_label.pack(pady=20)
 
-    def show_error(self, message):
-        """
-        Exibe uma janela de erro com a mensagem fornecida.
+    def result_error(self, message):
+        """Exibe uma mensagem de erro."""
+        self.result_label.configure(text=message, text_color="red")
 
-        Parâmetros:
-            message (str): A mensagem de erro a ser exibida.
-        """
-        ErrorWindow(self, message)
+    def result_info(self, message):
+        """Exibe uma mensagem informativa."""
+        self.result_label.configure(text=message, text_color="green")
 
-    def save_password(self):
-        """Função para salvar a senha criptografada para um domínio especificado."""
-        domain = self.entry_domain.get()
-        password = self.entry_password.get()
+    def save_or_update_password(self):
+        """Salva ou atualiza a senha para o domínio especificado."""
+        domain = self.entry_domain.get().strip()
+        password = self.entry_password.get().strip()
 
-        try:
-            fernet = FernetHasher(self.key)
-            encrypted_password = fernet.encrypt(password).decode('utf-8')
-            p1 = Password(domain=domain, password=encrypted_password)
-            p1.save()
-            self.result_label.configure(text="Senha salva com sucesso!")
-        except ValueError as e:
-            self.show_error(f"Erro ao salvar senha: {e}")
+        if not domain or not password:
+            self.result_error("Por favor, insira o domínio e a senha.")
+            return
+
+        fernet = FernetHasher(self.key)
+        encrypted_password = fernet.encrypt(password).decode('utf-8')
+
+        # Verifica se o domínio já existe
+        existing_domains = [item['domain'] for item in Password.get_all()]
+        if domain in existing_domains:
+            # Atualiza a senha existente
+            Password.update_password(domain, encrypted_password)
+            self.result_info(f"Senha para '{domain}' atualizada com sucesso.")
+        else:
+            # Salva um novo domínio e senha
+            new_password = Password(domain=domain, password=encrypted_password)
+            new_password.save()
+            self.result_info(f"Senha para '{domain}' salva com sucesso.")
+
+    def delete_password(self):
+        """Deleta a senha para o domínio especificado."""
+        domain = self.entry_domain.get().strip()
+
+        if not domain:
+            self.result_error("Por favor, insira o domínio para deletar.")
+            return
+
+        # Verifica se o domínio existe antes de tentar deletar
+        existing_domains = [item['domain'] for item in Password.get_all()]
+        if domain in existing_domains:
+            Password.delete_password(domain)
+            self.result_info(f"Senha para '{domain}' deletada com sucesso.")
+        else:
+            self.result_error(f"Domínio '{domain}' não encontrado.")
 
     def retrieve_password(self):
         """Recupera e descriptografa a senha para um domínio especificado."""
-        domain = self.entry_domain.get()
+        domain = self.entry_domain.get().strip()
+
+        if not domain:
+            self.result_error("Por favor, insira o domínio para recuperar a senha.")
+            return
 
         try:
             fernet = FernetHasher(self.key)
@@ -84,11 +119,20 @@ class PasswordManagerApp(ctk.CTk):
                     break
 
             if password:
-                self.result_label.configure(text=f"Senha recuperada: {password}")
+                self.result_info(f"Senha recuperada: {password}")
             else:
-                self.show_error("Nenhuma senha encontrada para este domínio.")
+                self.result_error(f"Domínio '{domain}' não encontrado.")
         except ValueError as e:
-            self.show_error(f"Erro ao recuperar senha: {e}")
+            self.result_error(f"Erro ao recuperar senha: {e}")
+
+    def show_error(self, message):
+        """
+        Exibe uma janela de erro com a mensagem fornecida.
+
+        Parâmetros:
+            message (str): A mensagem de erro a ser exibida.
+        """
+        ErrorWindow(self, message)
 
     def verify_or_create_key(self):
         """
