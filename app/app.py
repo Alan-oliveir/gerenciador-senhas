@@ -1,7 +1,8 @@
 import customtkinter as ctk
-from .models import Password
-from .encryption import validate_password, generate_key_from_password, load_existing_key, FernetHasher
+
 from .dialogs import ErrorWindow
+from .encryption import validate_password, generate_key_from_password, load_existing_key, FernetHasher
+from .models import Password
 
 # Configuração inicial do customtkinter
 ctk.set_appearance_mode("system")

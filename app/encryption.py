@@ -1,6 +1,7 @@
-from hashlib import sha256
 from base64 import urlsafe_b64encode
+from hashlib import sha256
 from pathlib import Path
+
 import cryptography.fernet
 from password_strength import PasswordPolicy
 

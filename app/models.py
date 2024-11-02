@@ -5,6 +5,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 DB_DIR = BASE_DIR / 'db'
 
+
 class BaseModel:
     """Classe base para manipulação de dados em arquivos de texto."""
 
@@ -40,6 +41,7 @@ class BaseModel:
                 results.append(tmp_dict)
 
         return results
+
 
 class Password(BaseModel):
     """Classe para representar uma senha e seu domínio associado."""
