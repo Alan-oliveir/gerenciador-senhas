@@ -70,7 +70,7 @@ class PasswordManagerApp(ctk.CTk):
             self.show_error(f"Erro ao salvar senha: {e}")
 
     def retrieve_password(self):
-        """Função para recuperar e descriptografar a senha para um domínio especificado."""
+        """Recupera e descriptografa a senha para um domínio especificado."""
         domain = self.entry_domain.get()
 
         try:
@@ -79,7 +79,7 @@ class PasswordManagerApp(ctk.CTk):
             password = None
 
             for item in data:
-                if domain in item['domain']:
+                if domain == item['domain']:
                     password = fernet.decrypt(item['password'])
                     break
 

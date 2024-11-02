@@ -4,6 +4,8 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/keys" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
+      <excludeFolder url="file://$MODULE_DIR$/db" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.12 (gerenciadorSenha)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
